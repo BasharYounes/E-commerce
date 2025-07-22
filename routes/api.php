@@ -4,7 +4,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdvController;
 use App\Http\Controllers\ForgetPasswordController;
+use App\Http\Controllers\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,9 +28,30 @@ Route::post('/reset-password',[ForgetPasswordController::class,'resetPassword'])
 
 
 
-Route::middleware('auth:sanctum')->group( function () {
-    
-    
-    Route::post('/refresh-token',[AuthController::class,'refreshToken']);
-    Route::post('/logout',[AuthController::class,'logout']);
+Route::prefix('adv')->group(function () {
+    Route::get('/',     [AdvController::class, 'index']);
+    Route::get('/show/{id}', [AdvController::class, 'show']);
+    Route::get('/search',[AdvController::class,'search']);
+
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/create',       [AdvController::class, 'store']);
+        Route::put('/update/{id}',    [AdvController::class, 'update']);
+        Route::delete('/delete/{id}', [AdvController::class, 'destroy']);
+    });
+});
+
+Route::prefix('category')->group(function () {
+    Route::get('/',     [CategoryController::class, 'index']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/create',       [CategoryController::class, 'store']);
+        Route::put('/update/{id}',    [CategoryController::class, 'update']);
+        Route::delete('/delete/{id}', [CategoryController::class, 'destroy']);
+    });
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
+    Route::post('/logout',        [AuthController::class, 'logout']);
 });
