@@ -15,6 +15,8 @@ use App\Repositories\AdvRepository;
 
 use App\Models\Adv;
 
+use Carbon\Carbon;
+
 class AdvController extends Controller
 {
     use ApiResponse;
@@ -46,10 +48,12 @@ class AdvController extends Controller
     public function show($id)
     {
         $ad = Adv::with('category', 'user')->findOrFail($id);
-        $published_duration = now()->diffInDays($ad->created_at);
+        $createdAt = $ad->created_at ? Carbon::parse($ad->created_at) : Carbon::now();
+        $published_duration = Carbon::now()->diffInDays($createdAt, false); // false: يمكن أن تكون سالبة
+        $published_duration = abs((int) $published_duration); // دائماً موجبة وعدد صحيح
         $viewsCount = $ad->views_count + 1;
-        $adv = $this->commandService->updateAd($ad,['views_count' => $viewsCount]);
-        return $this->success("",[$adv,$published_duration]);
+        $adv = $this->commandService->updateAd($ad, ['views_count' => $viewsCount]);
+        return $this->success("", [$adv, $published_duration]);
     }
 
     public function destroy($id)
