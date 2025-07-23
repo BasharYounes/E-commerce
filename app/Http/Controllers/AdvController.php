@@ -25,6 +25,11 @@ class AdvController extends Controller
         public AdQueryService $queryService,
         public AdvRepository $advRepository
     ) {}
+
+    public function index()
+    {
+        return Adv::with('user:id,name', 'category:id,name')->get();
+    }
     
     public function store(StoreAdRequest $request)
     {

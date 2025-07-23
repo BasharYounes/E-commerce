@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
-class CodeAndPasswordRequest extends FormRequest
+class PasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -31,7 +31,6 @@ class CodeAndPasswordRequest extends FormRequest
                     ->symbols()
                     ->uncompromised(),
             ],
-            'code' => 'required|string|size:6|regex:/^[0-9]{6}$/'
         ];
     }
 }

@@ -2,17 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\UserResetPasswordEvent;
-use App\Exceptions\CodeSendingException;
-use App\Http\Requests\EmailRequest;
-use App\Http\Requests\CodeAndPasswordRequest;
+use App\Events\UserRegistered;
+
+use App\Http\Requests\EmailAndCodeRequest;
+use App\Http\Requests\PasswordRequest;
+
 use Hash;
+
 use App\Repositories\UserRepository;
-use App\Services\PasswordReset;
+
 use App\Traits\ApiResponse;
+
 use Illuminate\Support\Facades\Password;
-use Laravel\Sanctum\PersonalAccessToken;
+
 use Str;
+
+use App\Services\CasheService;
+use App\Services\GenerateCode;
 
 
 class ForgetPasswordController extends Controller
@@ -21,10 +27,10 @@ class ForgetPasswordController extends Controller
 
 
     public function __construct(
-    protected PasswordReset $passwordReset,
-    protected UserRepository $userRepository
-    )
-    {}
+        protected GenerateCode $codeService,
+        protected UserRepository $userRepository,
+        protected CasheService $casheService)
+        {}
 
     public function forgotPassword(EmailRequest $request) 
     {
@@ -34,23 +40,35 @@ class ForgetPasswordController extends Controller
 
             event(new UserRegistered($user, $code)) ; 
             
-        return $this->success('تم إرسال رابط الاستعادة إلى بريدك',$resetLink);
+        return $this->success('تم إرسال كود إلى بريدك',$code);
     }
 
-    public function resetPassword(CodeAndPasswordRequest $request) 
+    public function checkCode(EmailAndCodeRequest $request) 
     {
+
+        $user = $this->userRepository->findByEmail($request->email);
+        
         $storedCode = $this->casheService->getCodeFromCashe($user);
 
         if (!$storedCode || $storedCode != $request->code) {
            throw new InvalidCodeException();
         }
 
-            $this->userRepository->update($user,['password' => Hash::make($request->password)]);
+        $this->casheService->forgetCodeFromCashe($user);
 
-            $this->casheService->forgetCodeFromCashe($user);
+        $this->userRepository->deleteUserToken($user);
 
-           $this->userRepository->deleteUserToken($user);
+        $token = $this->userRepository->createToken($user);
 
-        return $this->success( 'تم تحديث كلمة المرور بنجاح');
+        return $this->success( 'تم التحقق من الكود بنجاح', ['token' => $token]);
+    }
+
+    public function resetPassword(PasswordRequest $request)
+    {
+        $user = auth()->user();
+
+        $this->userRepository->update($user,['password' => Hash::make($request->password)]);
+
+       return $this->succes('تم تغيير كلمة السر بنجاح');
     }
 }

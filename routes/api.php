@@ -24,14 +24,13 @@ Route::post('/login',[AuthController::class,'login'])->middleware('throttle:5,1'
 Route::post('/verify-code',[AuthController::class,'VerifyCode']);
 Route::post('/resend-code',[AuthController::class,'ResendCode'])->middleware('throttle:3,10');
 Route::post('/forget-password',[ForgetPasswordController::class,'forgotPassword']);
-Route::post('/reset-password',[ForgetPasswordController::class,'resetPassword']);
 
 
 
 Route::prefix('adv')->group(function () {
     Route::get('/',     [AdvController::class, 'index']);
     Route::get('/show/{id}', [AdvController::class, 'show']);
-    Route::get('/search',[AdvController::class,'search']);
+    Route::post('/search',[AdvController::class,'search']);
 
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -52,6 +51,8 @@ Route::prefix('category')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/reset-password/{email}',[ForgetPasswordController::class,'resetPassword']);
+
     Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
     Route::post('/logout',        [AuthController::class, 'logout']);
 });

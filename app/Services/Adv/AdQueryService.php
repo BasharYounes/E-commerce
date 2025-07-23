@@ -20,12 +20,12 @@ public function searchActiveAds(array $filters): LengthAwarePaginator
     }
     
     if (!empty($filters['location'])) {
-        $query->where('location', 'LIKE', '%' . $filters['location'] . '%');
+        $location = preg_quote(trim($filters['location']));
+        $query->where('location', 'REGEXP', '[[:<:]]' . $location . '[[:>:]]');
     }
     
-    if (!empty($filters['category'])) {
-        // إذا كان لديك حقل اسم التصنيف في adv_reads
-        $query->where('category_name', 'LIKE', '%' . $filters['category'] . '%');
+    if (!empty($filters['category_id'])) {
+        $query->where('category_id', $filters['category_id']);
     }
     
     // معالجة الأسعار
