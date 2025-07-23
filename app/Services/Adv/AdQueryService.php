@@ -21,14 +21,13 @@ public function searchActiveAds(array $filters): LengthAwarePaginator
     
     if (!empty($filters['location'])) {
         $location = preg_quote(trim($filters['location']));
-        $query->where('location', 'REGEXP', '[[:<:]]' . $location . '[[:>:]]');
+        $query->where('location', 'LIKE', '%' . $filters['location'] . '%');
     }
     
     if (!empty($filters['category_id'])) {
         $query->where('category_id', $filters['category_id']);
     }
     
-    // معالجة الأسعار
     $min_price = $filters['min_price'] ?? null;
     $max_price = $filters['max_price'] ?? null;
     
