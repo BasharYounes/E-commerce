@@ -27,7 +27,7 @@ return new class extends Migration
             $table->foreign('category_id')->references('id')->on('categories');
             $table->foreign('user_id')->references('id')->on('users');
 
-            $table->index(['category_id', 'location', 'is_active', 'price']); 
+            $table->index(['category_id', 'location', 'is_active', 'price']);
             $table->index(['views_count','interactions_count']);
             $table->fullText('description');
 

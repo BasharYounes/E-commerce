@@ -18,6 +18,8 @@ class Adv extends Model
         'user_id',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
@@ -28,5 +30,29 @@ class Adv extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-   
+    // Many-to-Many relationships through pivot tables
+    public function likedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'likes', 'adv_id', 'user_id');
+    }
+
+    public function favoritedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'favorites', 'adv_id', 'user_id');
+    }
+
+    public function evaluatedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'evaluations', 'adv_id', 'user_id')
+                    ->withPivot('rating', 'comment')
+                    ->withTimestamps();
+    }
+
+    public function reportedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'reports', 'adv_id', 'user_id')
+                    ->withPivot('type', 'content')
+                    ->withTimestamps();
+    }
+
 }

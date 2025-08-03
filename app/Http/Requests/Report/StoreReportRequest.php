@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Http\Requests\Report;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class StoreReportRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        $reportTypes = [
+            'spam',
+            'fraud',
+            'inappropriate_content',
+            'wrong_category',
+            'already_sold',
+            'misleading_information',
+            'duplicate',
+            'other'
+        ];
+
+        return [
+            'adv_id' => 'required|exists:advs,id',
+            'type' => ['required', Rule::in($reportTypes)],
+            'content' => 'required_if:type,other|nullable|string|max:500'
+        ];
+    }
+}
