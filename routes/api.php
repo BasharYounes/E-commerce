@@ -27,6 +27,8 @@ Route::post('/login',[AuthController::class,'login'])->middleware('throttle:5,1'
 Route::post('/verify-code',[AuthController::class,'VerifyCode']);
 Route::post('/resend-code',[AuthController::class,'ResendCode'])->middleware('throttle:3,10');
 Route::post('/forget-password',[ForgetPasswordController::class,'forgotPassword']);
+Route::post('/check-code',[ForgetPasswordController::class,'checkCode']);
+
 
 
 Route::prefix('user')->group(function () {

@@ -6,6 +6,7 @@ use App\Events\UserRegistered;
 
 use App\Http\Requests\EmailAndCodeRequest;
 use App\Http\Requests\PasswordRequest;
+use App\Http\Requests\EmailRequest;
 
 use Hash;
 
