@@ -135,5 +135,4 @@ class AdvController extends Controller
         $favorites = $this->favoriteRepository->findFavoritesByUserId($user->id);
         return $this->success('success',$favorites);
     }
-
 }
