@@ -14,7 +14,7 @@ class StoreAdRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'string|mimes:jpeg,png,jpg,gif,svg|max:255',
+            'image' => 'sometimes|mimes:jpeg,png,jpg,gif,svg|max:255',
             'price' => 'required|numeric|min:0',
             'location' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -35,4 +35,4 @@ class StoreAdRequest extends FormRequest
             'description.required' => 'يجب إدخال الوصف',
         ];
     }
-} 
+}

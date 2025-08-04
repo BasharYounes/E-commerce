@@ -20,6 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'image',
         'password',
         'email_verified_at'
     ];
@@ -32,6 +33,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'created_at', 
+        'updated_at'
     ];
 
     /**
@@ -47,24 +50,35 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function media()
+
+    // Many-to-Many relationships through pivot tables
+    public function likedAdvs()
     {
-        return $this->morphOne(Media::class, 'mediable');
+        return $this->belongsToMany(Adv::class, 'likes', 'user_id', 'adv_id');
     }
 
-    public function channel()
+    public function favoriteAdvs()
     {
-        return $this->hasMany(Channel::class);
+        return $this->belongsToMany(Adv::class, 'favorites', 'user_id', 'adv_id');
     }
 
-    public function comments()  
+    public function evaluatedAdvs()
     {
-        $this->hasMany(Comment::class);
+        return $this->belongsToMany(Adv::class, 'evaluations', 'user_id', 'adv_id')
+                    ->withPivot('rating', 'comment')
+                    ->withTimestamps();
     }
 
-    public function likes()
+    public function reportedAdvs()
     {
-        return $this->hasMany(Like::class);
+        return $this->belongsToMany(Adv::class, 'reports', 'user_id', 'adv_id')
+                    ->withPivot('type', 'content')
+                    ->withTimestamps();
+    }
+
+    public function advs()
+    {
+        return $this->hasMany(Adv::class);
     }
 
 }

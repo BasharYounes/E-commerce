@@ -79,18 +79,6 @@ class Handler extends ExceptionHandler
             case $e instanceof InvalidCredentialsException:
                 return $e->render();
                 
-            case $e instanceof FileStorageException:
-                return $e->render();
-                
-            case $e instanceof AudioRegistrationException:
-                return $e->render();
-                
-            case $e instanceof PodcastRegistrationException:
-                return $e->render();
-                
-            case $e instanceof ContentRegistrationException:
-                return $e->render();
-                
             case $e instanceof Exception:
                 return $this->error(
                     'حدث خطأ غير متوقع',
