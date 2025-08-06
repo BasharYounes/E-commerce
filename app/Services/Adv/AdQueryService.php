@@ -52,10 +52,17 @@ public function searchActiveAds(array $filters): LengthAwarePaginator
         ->pluck('adv_id')
         ->toArray();
 
+        $favouriteAdIds = \DB::table('favorites')
+        ->where('user_id', $user->id)
+        ->whereIn('adv_id', $adIds)
+        ->pluck('adv_id')
+        ->toArray();
+
         // dd($likedAdIds);
 
-    $ads->getCollection()->transform(function ($ad) use ($likedAdIds) {
+    $ads->getCollection()->transform(function ($ad) use ($likedAdIds,$favouriteAdIds) {
         $ad->is_liked = in_array($ad->id, $likedAdIds);
+        $ad->is_favourite = in_array($ad->id, $favouriteAdIds);
         return $ad;
     });
 
