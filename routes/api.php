@@ -44,13 +44,14 @@ Route::prefix('user')->group(function () {
 Route::prefix('adv')->group(function () {
     Route::get('/',     [AdvController::class, 'index']);
     Route::get('/show/{id}', [AdvController::class, 'show']);
-    Route::post('/search',[AdvController::class,'search']);
+    
 
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create',       [AdvController::class, 'store']);
         Route::put('/update/{id}',    [AdvController::class, 'update']);
         Route::delete('/delete/{id}', [AdvController::class, 'destroy']);
+        Route::post('/search',[AdvController::class,'search']);
 
         Route::post('/add-like', [AdvController::class, 'addLike']); // addLike
         Route::post('/remove-like', [AdvController::class, 'removeLike']); // removeLike

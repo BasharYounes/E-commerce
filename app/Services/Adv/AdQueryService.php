@@ -13,7 +13,7 @@ class AdQueryService
     
 public function searchActiveAds(array $filters): LengthAwarePaginator
 {
-    $query = AdvRead::where('is_active', 1);
+    $query = Adv::where('is_active', 1);
     
     if (!empty($filters['description'])) {
         $query->where('description', 'LIKE', '%' . $filters['description'] . '%');
@@ -38,9 +38,30 @@ public function searchActiveAds(array $filters): LengthAwarePaginator
     } elseif ($max_price) {
         $query->where('price', '<=', $max_price);
     }
-    
-    return $query->orderBy('views_count', 'desc')
+
+    $ads = $query->orderBy('views_count', 'desc')
                  ->paginate(15);
+
+
+    $user = auth()->user();
+    $adIds = $ads->pluck('id')->toArray();
+
+    $likedAdIds = \DB::table('likes')
+        ->where('user_id', $user->id)
+        ->whereIn('adv_id', $adIds)
+        ->pluck('adv_id')
+        ->toArray();
+
+        // dd($likedAdIds);
+
+    $ads->getCollection()->transform(function ($ad) use ($likedAdIds) {
+        $ad->is_liked = in_array($ad->id, $likedAdIds);
+        return $ad;
+    });
+
+    
+    return $ads;
+    
 }
 
 }
