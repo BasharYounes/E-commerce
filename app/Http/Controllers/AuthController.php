@@ -51,7 +51,7 @@ class AuthController extends Controller
 
     public function EditInformation(UpdateUserInformationRequest $request)
     {
-        $user = $this->userRepository->update(auth()->user(), [$request->validated()]);
+        $user = $this->userRepository->update(auth()->user(), $request);
         
         return $this->success('success', ['user'=> $user]);
     }

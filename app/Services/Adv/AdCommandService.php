@@ -8,19 +8,46 @@ use Illuminate\Support\Facades\DB;
 
 class AdCommandService
 {
-    public function createAd(array $data): Adv
-    {
+    public function createAd( $request): Adv
+    {  
+        $data = $request->only(['title', 'description', 'price', 'phone', 'category_id','location']);
+
         $data['user_id'] = auth()->id();
-        $ad = DB::transaction(function () use ($data) {
+        
+        $ad = DB::transaction(function () use ($data,$request) {
+            
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $filename = time() . '.' . $request->file('image')->extension();
+                $path = Storage::disk('public')->putFileAs(
+                    'advs',
+                    $request->file('image'),
+                    $filename,
+                    ['visibility' => 'public']
+                );
+                $data['image'] = $path;
+            }
             return Adv::create($data);
         });
         UpdateAdReadJob::dispatch('created', $ad);
         return $ad;
     }
 
-    public function updateAd(Adv $ad, array $data): Adv
+    public function updateAd(Adv $ad,$request): Adv
     {
-        $updatedAd = DB::transaction(function () use ($ad, $data) {
+        $data = $request->only(['title', 'description', 'price', 'phone', 'category_id','location']);
+        $updatedAd = DB::transaction(function () use ($ad, $data,$request) {
+
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $filename = time() . '.' . $request->file('image')->extension();
+                $path = Storage::disk('public')->putFileAs(
+                    'advs',
+                    $request->file('image'),
+                    $filename,
+                    ['visibility' => 'public']
+                );
+                $data['image'] = $path;
+            }
+
             $ad->update($data);
             return $ad;
         });

@@ -16,6 +16,6 @@ class FavoriteRepository
 
     public function findFavoritesByUserId($userId)
     {
-        return Favorite::where('user_id', $userId)->get();
+        return Favorite::with('adv')->where('user_id', $userId)->get();
     }
 }

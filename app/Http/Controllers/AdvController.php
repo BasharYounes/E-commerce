@@ -2,23 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AddLikeToAdvRequest;
+
 use App\Traits\ApiResponse;
 
 use App\Services\Adv\AdCommandService;
 use App\Services\Adv\AdQueryService;
+use App\Services\Favorites\FavoriteCommandService;
+use App\Services\Likes\LikeAnAdvCommandService;
 
 use App\Http\Requests\Adv\StoreAdRequest;
 use App\Http\Requests\Adv\SearchAdRequest;
 use App\Http\Requests\Adv\UpdateAdRequest;
+use App\Http\Requests\AddLikeToAdvRequest;
 
 use App\Repositories\AdvRepository;
 
 use App\Models\Adv;
+use App\Models\UserActivities;
+
 use App\Repositories\FavoriteRepository;
 use App\Repositories\LikeRepository;
-use App\Services\Favorites\FavoriteCommandService;
-use App\Services\Likes\LikeAnAdvCommandService;
+
+
 use Carbon\Carbon;
 
 class AdvController extends Controller
@@ -42,7 +47,7 @@ class AdvController extends Controller
     public function userAdvs()
     {
         $user = auth()->user();
-        $advs = Adv::with('category:name')->where('user_id',$user->id)->get();
+        $advs = Adv::with('category:name','user:id,name')->where('user_id',$user->id)->get();
         return $this->success('Advs for ' . $user->name . ' are:', $advs);
     }
 
@@ -68,11 +73,21 @@ class AdvController extends Controller
     public function show($id)
     {
         $ad = Adv::with('category', 'user')->findOrFail($id);
+        
         $createdAt = $ad->created_at ? Carbon::parse($ad->created_at) : Carbon::now();
-        $published_duration = Carbon::now()->diffInDays($createdAt, false); // false: يمكن أن تكون سالبة
-        $published_duration = abs((int) $published_duration); // دائماً موجبة وعدد صحيح
-        $viewsCount = $ad->views_count + 1;
-        $adv = $this->commandService->updateAd($ad, ['views_count' => $viewsCount]);
+        $published_duration = Carbon::now()->diffInDays($createdAt, false); 
+        $published_duration = abs((int) $published_duration); 
+
+        if (!UserActivities::where('user_id', auth()->id())->where('activity_type', 'view')->where('adv_id', $ad->id)->exists()) {
+            $this->likeCommandService->addView($ad);
+
+            $viewsCount = $ad->views_count + 1;
+
+            $ad = $this->commandService->updateAd($ad, ['views_count' => $viewsCount]);
+        }
+
+        $adv = $this->queryService->is_actionUser($ad);
+
         return $this->success("", [$adv, $published_duration]);
     }
 

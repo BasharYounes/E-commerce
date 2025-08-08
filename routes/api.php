@@ -43,7 +43,7 @@ Route::prefix('user')->group(function () {
 
 Route::prefix('adv')->group(function () {
     Route::get('/',     [AdvController::class, 'index']);
-    Route::get('/show/{id}', [AdvController::class, 'show']);
+    
     
 
 
@@ -60,6 +60,8 @@ Route::prefix('adv')->group(function () {
         Route::post('/remove-favorite', [AdvController::class, 'removeFromFavorite']); // removeFavorite
 
         Route::get('/all-user-advs',       [AdvController::class, 'userAdvs']);
+
+        Route::get('/show/{id}', [AdvController::class, 'show']);
     });
 });
 

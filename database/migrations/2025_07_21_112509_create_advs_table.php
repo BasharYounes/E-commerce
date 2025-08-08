@@ -16,6 +16,7 @@ return new class extends Migration
             $table->String('image');
             $table->decimal('price',10,2);
             $table->string('location');
+            $table->string('phone');
             $table->unsignedBigInteger('views_count')->default(0);
             $table->unsignedBigInteger('interactions_count')->default(0);
             $table->unsignedBigInteger('category_id');

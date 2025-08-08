@@ -10,9 +10,21 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
-    public function registerUser(array $data)
+    public function registerUser( $request)
     {
-        // dd($data);
+
+        $data = $request->only(['name', 'email', 'phone']);
+
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $filename = time() . '.' . $request->file('image')->extension();
+            $path = Storage::disk('public')->putFileAs(
+                'users',
+                $request->file('image'),
+                $filename,
+                ['visibility' => 'public']
+            );
+            $data['image'] = $path;
+        }
 
         $data['password'] = Hash::make($data['password']);
 

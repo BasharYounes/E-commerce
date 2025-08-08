@@ -20,6 +20,7 @@ class StoreAdRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'description' => 'required|string',
             'is_active' => 'boolean',
+            'phone' => 'required|string|max:255',
         ];
     }
 

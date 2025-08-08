@@ -6,6 +6,7 @@ use App\Models\AdvRead;
 use App\Models\Adv;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class AdQueryService
 {
@@ -42,33 +43,26 @@ public function searchActiveAds(array $filters): LengthAwarePaginator
     $ads = $query->orderBy('views_count', 'desc')
                  ->paginate(15);
 
-
-    $user = auth()->user();
-    $adIds = $ads->pluck('id')->toArray();
-
-    $likedAdIds = \DB::table('likes')
-        ->where('user_id', $user->id)
-        ->whereIn('adv_id', $adIds)
-        ->pluck('adv_id')
-        ->toArray();
-
-        $favouriteAdIds = \DB::table('favorites')
-        ->where('user_id', $user->id)
-        ->whereIn('adv_id', $adIds)
-        ->pluck('adv_id')
-        ->toArray();
-
-        // dd($likedAdIds);
-
-    $ads->getCollection()->transform(function ($ad) use ($likedAdIds,$favouriteAdIds) {
-        $ad->is_liked = in_array($ad->id, $likedAdIds);
-        $ad->is_favourite = in_array($ad->id, $favouriteAdIds);
-        return $ad;
-    });
-
-    
     return $ads;
     
+}  
+
+public function is_actionUser(Adv $adv)
+{
+    $user = auth()->user();
+    $adId = $adv->id; 
+
+    $adv->is_liked = \DB::table('likes')
+        ->where('user_id', $user->id)
+        ->where('adv_id', $adId)
+        ->exists();
+
+    $adv->is_favourite = \DB::table('favorites')
+        ->where('user_id', $user->id)
+        ->where('adv_id', $adId)
+        ->exists();
+
+    return $adv;
 }
 
 }

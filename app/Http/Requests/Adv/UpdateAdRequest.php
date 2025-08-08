@@ -20,6 +20,7 @@ class UpdateAdRequest extends FormRequest
             'category_id' => 'sometimes|exists:categories,id',
             'description' => 'sometimes|string',
             'is_active' => 'sometimes|boolean',
+            'phone' => 'sometimes|string|max:255',
         ];
     }
 

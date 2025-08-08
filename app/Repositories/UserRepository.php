@@ -6,6 +6,7 @@ use App\Models\PasswordResetToken;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 
 class UserRepository {
     use ApiResponse;
@@ -13,9 +14,22 @@ class UserRepository {
         return User::where('email', $email)->firstOrFail();
     }
 
-    public function update(User $user, array $data) {
+    public function update(User $user,  $request) {
+        $data = $request->only(['name', 'email', 'phone']);
+
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $filename = time() . '.' . $request->file('image')->extension();
+            $path = Storage::disk('public')->putFileAs(
+                'users',
+                $request->file('image'),
+                $filename,
+                ['visibility' => 'public']
+            );
+            $data['image'] = $path;
+        }
+
         $user->update($data);
-        return $user;
+        return $user->fresh();
     }
 
   
