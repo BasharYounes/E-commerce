@@ -53,7 +53,8 @@ class AdvController extends Controller
 
     public function store(StoreAdRequest $request)
     {
-        $ad = $this->commandService->createAd($request->validated());
+        // Pass the full request so file uploads are handled and to avoid only() on array
+        $ad = $this->commandService->createAd($request);
         return $this->success('تم نشر الإعلان بنجاح',$ad);
     }
 
@@ -66,7 +67,8 @@ class AdvController extends Controller
     public function update(UpdateAdRequest $request,$id)
     {
         $ad =  $this->advRepository->findAdv($id);
-        $updatedAd = $this->commandService->updateAd($ad, $request->validated());
+        // Pass the full request so file uploads are handled and to avoid only() on array
+        $updatedAd = $this->commandService->updateAd($ad, $request);
         return $this->success('تم تعديل الإعلان بنجاح',$updatedAd);
     }
 

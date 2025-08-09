@@ -14,18 +14,23 @@ class UserRepository {
         return User::where('email', $email)->firstOrFail();
     }
 
-    public function update(User $user,  $request) {
-        $data = $request->only(['name', 'email', 'phone']);
+    public function update(User $user, $request) {
+        // Accept either an array of attributes or a Request/FormRequest instance
+        if (is_array($request)) {
+            $data = $request;
+        } else {
+            $data = $request->only(['name', 'email', 'phone', 'email_verified_at', 'password']);
 
-        if ($request->hasFile('image') && $request->file('image')->isValid()) {
-            $filename = time() . '.' . $request->file('image')->extension();
-            $path = Storage::disk('public')->putFileAs(
-                'users',
-                $request->file('image'),
-                $filename,
-                ['visibility' => 'public']
-            );
-            $data['image'] = $path;
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $filename = time() . '.' . $request->file('image')->extension();
+                $path = Storage::disk('public')->putFileAs(
+                    'users',
+                    $request->file('image'),
+                    $filename,
+                    ['visibility' => 'public']
+                );
+                $data['image'] = $path;
+            }
         }
 
         $user->update($data);

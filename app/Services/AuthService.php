@@ -7,13 +7,14 @@ use App\Models\User;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AuthService
 {
-    public function registerUser( $request)
+    public function registerUser($request)
     {
 
-        $data = $request->only(['name', 'email', 'phone']);
+        $data = $request->only(['name', 'email', 'phone', 'password']);
 
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $filename = time() . '.' . $request->file('image')->extension();

@@ -70,6 +70,6 @@ class ForgetPasswordController extends Controller
 
         $this->userRepository->update($user,['password' => Hash::make($request->password)]);
 
-       return $this->succes('تم تغيير كلمة السر بنجاح');
+       return $this->success('تم تغيير كلمة السر بنجاح');
     }
 }

@@ -40,7 +40,7 @@ class AuthController extends Controller
      */
     public function Register(RegisterRequest $registerRequest)
     {
-        $user = $this->authService->registerUser($registerRequest->validated());
+        $user = $this->authService->registerUser($registerRequest);
 
         $code = $this->codeService->generateCode($user);
 
