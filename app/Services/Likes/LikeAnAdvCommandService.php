@@ -10,7 +10,7 @@ use App\Models\Adv;
 
 class LikeAnAdvCommandService
 {
-    public function addLike(array $data): Like
+    public function addLike(array $data): UserActivities
     {
 
         $data['user_id'] = Auth::id();

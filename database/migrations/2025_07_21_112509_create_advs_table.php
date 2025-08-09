@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('advs', function (Blueprint $table) {
             $table->id();
-            $table->String('image');
+            $table->String('image')->nullable();
             $table->decimal('price',10,2);
             $table->string('location');
             $table->string('phone');

@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdvController;
 use App\Http\Controllers\ForgetPasswordController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\RecommendedController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +44,8 @@ Route::prefix('user')->group(function () {
 
 Route::prefix('adv')->group(function () {
     Route::get('/',     [AdvController::class, 'index']);
-    
+    Route::get('/recommended', [RecommendedController::class, 'index']);
+    Route::post('/get-recommendations-for-user/{id}', [RecommendedController::class, 'getRecommendationsForUser']);
     
 
 
