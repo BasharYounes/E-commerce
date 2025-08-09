@@ -76,7 +76,7 @@ Route::prefix('category')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/reset-password/{email}',[ForgetPasswordController::class,'resetPassword']);
+    Route::post('/reset-password',[ForgetPasswordController::class,'resetPassword']);
 
     Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
     Route::post('/logout',        [AuthController::class, 'logout']);
