@@ -52,9 +52,10 @@ public function is_actionUser(Adv $adv)
     $user = auth()->user();
     $adId = $adv->id; 
 
-    $adv->is_liked = \DB::table('likes')
+    $adv->is_liked = \DB::table('user_activities')
         ->where('user_id', $user->id)
         ->where('adv_id', $adId)
+        ->where('activity_type','like')
         ->exists();
 
     $adv->is_favourite = \DB::table('favorites')
