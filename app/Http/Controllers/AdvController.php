@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Events\GenericNotificationEvent;
 use App\Traits\ApiResponse;
 
 use App\Services\Adv\AdCommandService;
@@ -53,8 +54,12 @@ class AdvController extends Controller
 
     public function store(StoreAdRequest $request)
     {
-        // Pass the full request so file uploads are handled and to avoid only() on array
         $ad = $this->commandService->createAd($request);
+         event(new GenericNotificationEvent(
+            user:auth()->user(),
+            type:'create Adv',
+            data:[]
+        ));
         return $this->success('تم نشر الإعلان بنجاح',$ad);
     }
 
@@ -69,10 +74,26 @@ class AdvController extends Controller
         $ad =  $this->advRepository->findAdv($id);
         // Pass the full request so file uploads are handled and to avoid only() on array
         $updatedAd = $this->commandService->updateAd($ad, $request);
+         event(new GenericNotificationEvent(
+            user:auth()->user(),
+            type:'Update Adv',
+            data:[]
+        ));
         return $this->success('تم تعديل الإعلان بنجاح',$updatedAd);
     }
 
-    public function show($id)
+    public function showVisitor($id)
+    {
+        $ad = Adv::with('category', 'user')->findOrFail($id);
+        
+        $createdAt = $ad->created_at ? Carbon::parse($ad->created_at) : Carbon::now();
+        $published_duration = Carbon::now()->diffInDays($createdAt, false); 
+        $published_duration = abs((int) $published_duration); 
+
+        return $this->success('',[$ad,$published_duration]);
+    }
+
+    public function showUser($id)
     {
         $ad = Adv::with('category', 'user')->findOrFail($id);
         
@@ -90,13 +111,77 @@ class AdvController extends Controller
 
         $adv = $this->queryService->is_actionUser($ad);
 
-        return $this->success("", [$adv, $published_duration]);
+        $categoryId = $adv->category_id;
+        $price = $adv->price;
+
+        $group1 = Adv::query()
+            ->where('id', '!=', $adv->id)
+            ->where('category_id', $categoryId)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $group2 = Adv::query()
+            ->where('id', '!=', $adv->id)
+            ->where('category_id', $categoryId)
+            ->whereBetween('price', [$price * 0.8, $price * 1.2])
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $group3 = Adv::query()
+            ->where('id', '!=', $adv->id)
+            ->where('category_id', $categoryId)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $keywords = collect(explode(' ', $adv->description))
+            ->filter(fn($word) => mb_strlen($word) > 2)
+            ->take(5);
+
+        $group4 = Adv::query()
+            ->where('id', '!=', $adv->id)
+            ->where('category_id', $categoryId)
+            ->where(function ($query) use ($keywords) {
+                foreach ($keywords as $word) {
+                    $query->orWhere('description', 'LIKE', "%{$word}%");
+                }
+            })
+            ->select('*')
+            ->selectRaw(
+                '(' . collect($keywords)->map(function($word) {
+                    return "CASE WHEN description LIKE '%{$word}%' THEN 1 ELSE 0 END";
+                })->implode(' + ') . ') as match_score'
+            )
+            ->orderByDesc('match_score')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return $this->success("",
+         [$adv, 
+         $published_duration,
+         'Recommends Advs'=>$group1
+            ->merge($group2)
+            ->merge($group3)
+            ->merge($group4)
+            ->unique('id')
+            ->take(10)
+            ->values()
+            ->all()
+        ]);
     }
 
     public function destroy($id)
     {
         $ad =  $this->advRepository->findAdv($id);
         $this->commandService->deleteAd($ad);
+        event(new GenericNotificationEvent(
+            user:auth()->user(),
+            type:'Delete Adv',
+            data:[]
+        ));
         return $this->success('تم حذف الإعلان بنجاح');
     }
 

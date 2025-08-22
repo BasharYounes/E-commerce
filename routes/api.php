@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -46,7 +47,7 @@ Route::prefix('adv')->group(function () {
     Route::get('/',     [AdvController::class, 'index']);
     Route::get('/recommended', [RecommendedController::class, 'index']);
     Route::post('/get-recommendations-for-user/{id}', [RecommendedController::class, 'getRecommendationsForUser']);
-    
+    Route::get('/show-visitor/{id}', [AdvController::class, 'showVisitor']);
 
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -63,7 +64,7 @@ Route::prefix('adv')->group(function () {
 
         Route::get('/all-user-advs',       [AdvController::class, 'userAdvs']);
 
-        Route::get('/show/{id}', [AdvController::class, 'show']);
+        Route::get('/show-user/{id}', [AdvController::class, 'showUser']);
     });
 });
 
@@ -82,4 +83,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
     Route::post('/logout',        [AuthController::class, 'logout']);
+
+    Route::get('/notifications', [NotificationController::class, 'index']);
 });

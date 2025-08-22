@@ -27,6 +27,7 @@ class RegisterRequest extends FormRequest
             'password' => 'required|min:8|confirmed',
             'phone' => 'sometimes|string|max:255',
             'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'fcm_token' => 'sometimes|string'
         ];
     }
 
