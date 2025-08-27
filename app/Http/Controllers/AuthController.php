@@ -162,4 +162,15 @@ class AuthController extends Controller
         $user = auth()->user();
         return $this->success("success", $user);
     }
+
+    public function storeFCM_Token(Request $request)
+    {
+        $request->validate([
+            'fcm_token' => 'required|string'
+        ]);
+    
+        $this->authService->storeFCM(auth()->user(),$request->input('fcm_token'));
+    
+        return $this->success("Token saved successfully");
+    }
 }

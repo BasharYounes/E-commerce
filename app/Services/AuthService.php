@@ -44,4 +44,9 @@ class AuthService
             throw new AuthenticationException();
         }
     }
+
+    public function storeFCM(User $user,string $fcm_token)
+    {
+        $user->update(['fcm_token' => $fcm_token]);
+    }
 }

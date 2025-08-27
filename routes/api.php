@@ -85,4 +85,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout',        [AuthController::class, 'logout']);
 
     Route::get('/notifications', [NotificationController::class, 'index']);
+
+    Route::post('/store-fcm-token', [AuthController::class, 'storeFCM_Token']);
+
+
 });
