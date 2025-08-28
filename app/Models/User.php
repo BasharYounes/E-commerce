@@ -126,6 +126,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all notifications for the user.
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    
+
+    /**
      * Accessor: return full image URL if stored path exists
      */
     public function getImageAttribute($value)
@@ -133,11 +143,13 @@ class User extends Authenticatable
         if (empty($value)) {
             return null;
         }
-        // If already a URL or public storage path, return as is
+        
         if (is_string($value) && (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, '/storage/'))) {
             return $value;
         }
         return Storage::url($value);
     }
+    
+    
 
 }

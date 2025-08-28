@@ -126,4 +126,7 @@ class AdQueryService
             ->all();
     }
 
+
+
+
 }

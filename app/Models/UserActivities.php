@@ -37,4 +37,6 @@ class UserActivities extends Model
     {
         return $query->where('adv_id', $advId);
     }
+
+
 }

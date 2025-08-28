@@ -70,11 +70,13 @@ class AdvController extends Controller
         $ad =  $this->advRepository->findAdv($id);
         
         $updatedAd = $this->commandService->updateAd($ad, $request);
+        //**begin FCM Instruction **
         //  event(new GenericNotificationEvent(
         //     user:auth()->user(),
         //     type:'Update Adv',
         //     data:[]
         // ));
+        //**End FCM Instruction**
         return $this->success('تم تعديل الإعلان بنجاح',$updatedAd);
     }
 
@@ -107,7 +109,7 @@ class AdvController extends Controller
 
         $adv = $this->queryService->is_actionUser($ad);
 
-        $recommended_Adv = $this->queryService->getRecommendAdvs($adv);
+        $recommended_Adv = $this->queryService->getRecommendAdvs($ad);
         
 
         return $this->success('The Resuls Are :',

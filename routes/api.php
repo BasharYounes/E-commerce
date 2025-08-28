@@ -46,7 +46,7 @@ Route::prefix('user')->group(function () {
 Route::prefix('adv')->group(function () {
     Route::get('/',     [AdvController::class, 'index']);
     Route::get('/recommended', [RecommendedController::class, 'index']);
-    Route::post('/get-recommendations-for-user/{id}', [RecommendedController::class, 'getRecommendationsForUser']);
+    Route::post('/get-recommendations-favourite', [RecommendedController::class, 'getRecommendationsForUser']);
     Route::get('/show-visitor/{id}', [AdvController::class, 'showVisitor']);
 
 
@@ -86,7 +86,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/notifications', [NotificationController::class, 'index']);
 
+    Route::get('/show-notification/{id}', [NotificationController::class, 'show']);
+
     Route::post('/store-fcm-token', [AuthController::class, 'storeFCM_Token']);
+
+    Route::post('/mark-is-read',[NotificationController::class,'markAsRead']);
 
 
 });
