@@ -21,6 +21,13 @@ class NotificationService
     {
         $template = config("notifications.templates.$type");
 
+        if (!$template) {
+            $template = [
+                'title' => 'إشعار جديد',
+                'body' => 'لديك إشعار جديد'
+            ];
+        }
+
         return [
             'title' => $this->replacePlaceholders($template['title'], $data),
             'body' => $this->replacePlaceholders($template['body'], $data)
@@ -29,9 +36,16 @@ class NotificationService
 
     protected function replacePlaceholders(string $text, array $data): string
     {
+        // إذا لم تكن هناك متغيرات في النص، أعد النص كما هو
+        if (empty($data) || !preg_match('/\{\{[^}]+\}\}/', $text)) {
+            return $text;
+        }
+
+        // استبدل المتغيرات الموجودة
         foreach ($data as $key => $value) {
             $text = str_replace("{{$key}}", $value, $text);
         }
+
         return $text;
     }
 
