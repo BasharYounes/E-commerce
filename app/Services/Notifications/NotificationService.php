@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Services\Notifications;
+
 use App\Models\User;
 use Kreait\Firebase\Messaging\CloudMessage;
 
