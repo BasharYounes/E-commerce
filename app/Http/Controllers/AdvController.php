@@ -109,7 +109,9 @@ class AdvController extends Controller
 
         $adv = $this->queryService->is_actionUser($ad);
 
-        $recommended_Adv = $this->queryService->getRecommendAdvs($ad);
+        $isOwner = auth()->id() === $ad->user_id;
+        
+        $recommended_Adv = $isOwner ? [] : $this->queryService->getRecommendAdvs($ad);
         
 
         return $this->success('The Resuls Are :',
