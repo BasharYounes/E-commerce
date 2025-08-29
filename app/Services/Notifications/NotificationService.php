@@ -21,10 +21,11 @@ class NotificationService
     {
         $template = config("notifications.templates.$type");
 
-        return [
-            'title' => $this->replacePlaceholders($template['title'], $data),
-            'body' => $this->replacePlaceholders($template['body'], $data)
-        ];    
+         return $template;
+         //[
+        //     'title' => $this->replacePlaceholders($template['title'], $data),
+        //     'body' => $this->replacePlaceholders($template['body'], $data)
+        // ];    
     }
 
     protected function replacePlaceholders(string $text, array $data): string
