@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\TestNotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -91,6 +92,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/store-fcm-token', [AuthController::class, 'storeFCM_Token']);
 
     Route::post('/mark-is-read',[NotificationController::class,'markAsRead']);
+
+    // Test notification routes
+    Route::post('/test-notification', [TestNotificationController::class, 'sendTestNotification']);
+    Route::post('/send-notification-to-all', [TestNotificationController::class, 'sendNotificationToAll']);
 
 
 });

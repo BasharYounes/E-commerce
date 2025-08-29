@@ -21,11 +21,10 @@ class NotificationService
     {
         $template = config("notifications.templates.$type");
 
-         return $template;
-         //[
-        //     'title' => $this->replacePlaceholders($template['title'], $data),
-        //     'body' => $this->replacePlaceholders($template['body'], $data)
-        // ];    
+        return [
+            'title' => $this->replacePlaceholders($template['title'], $data),
+            'body' => $this->replacePlaceholders($template['body'], $data)
+        ];    
     }
 
     protected function replacePlaceholders(string $text, array $data): string
@@ -39,12 +38,23 @@ class NotificationService
     private function sendFCM(User $user, array $content): void
     {
         try {
+            if (empty($user->fcm_token)) {
+                \Log::warning('المستخدم لا يملك FCM token: ' . $user->id);
+                return;
+            }
+
             $messaging = app('firebase.messaging');
             $message = CloudMessage::withTarget('token', $user->fcm_token)
-                ->withNotification($content);
+                ->withNotification($content)
+                ->withData([
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    'sound' => 'default'
+                ]);
+            
             $messaging->send($message);
+            \Log::info('تم إرسال الإشعار بنجاح للمستخدم: ' . $user->id);
         } catch (\Exception $e) {
-            \Log::error('فشل إرسال الإشعار: ' . $e->getMessage());
+            \Log::error('فشل إرسال الإشعار للمستخدم ' . $user->id . ': ' . $e->getMessage());
         }
     }
     
