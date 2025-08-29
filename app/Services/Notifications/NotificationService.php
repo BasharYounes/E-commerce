@@ -2,6 +2,7 @@
 
 namespace App\Services\Notifications;
 
+use App\Models\Notification;
 use App\Models\User;
 use Kreait\Firebase\Messaging\CloudMessage;
 

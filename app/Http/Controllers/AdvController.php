@@ -71,11 +71,11 @@ class AdvController extends Controller
         
         $updatedAd = $this->commandService->updateAd($ad, $request);
         //**begin FCM Instruction **
-        //  event(new GenericNotificationEvent(
-        //     user:auth()->user(),
-        //     type:'Update Adv',
-        //     data:[]
-        // ));
+         event(new GenericNotificationEvent(
+            user:auth()->user(),
+            type:'Update Adv',
+            data:[]
+        ));
         //**End FCM Instruction**
         return $this->success('تم تعديل الإعلان بنجاح',$updatedAd);
     }
