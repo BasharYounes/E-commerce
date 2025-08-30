@@ -12,7 +12,7 @@ class AdQueryService
 {
 
     
-    public function searchActiveAds(array $filters): LengthAwarePaginator
+    public function searchActiveAds(array $filters)
     {
         $query = Adv::where('is_active', 1);
         
@@ -43,7 +43,7 @@ class AdQueryService
         $ads = $query->orderBy('views_count', 'desc')
                     ->paginate(15);
 
-        return $ads;
+        return $this->is_actionUser($ads);
         
     }  
 
@@ -62,6 +62,11 @@ class AdQueryService
             ->where('user_id', $user->id)
             ->where('adv_id', $adId)
             ->exists();
+
+            if($user->id != $adv->user_id)
+            {
+                $adv->is_follow = $user->isFollowing($adv->user_id);
+            }
 
         return $adv;
     }

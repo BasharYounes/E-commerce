@@ -192,9 +192,9 @@ class User extends Authenticatable
     }
     
     // للتحقق إذا كان يتابع مستخدم معين
-    public function isFollowing(User $user)
+    public function isFollowing($id)
     {
-        return $this->following()->where('followed_id', $user->id)->exists();
+        return $this->following()->where('followed_id', $id)->exists();
     }
 
 }
