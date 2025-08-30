@@ -51,7 +51,11 @@ class RecommendedController extends Controller
             return $this->getGeneralRecommendations($limit);
         }
 
-        $recommendedAds = $this->getAdsBasedOnRecentActivities($recentAds, $limit);
+        $smartAds = $this->getAdsBasedOnRecentActivities($recentAds, $limit);
+        
+        $followingAds = $this->advrepository->getFollowingUsersAds($user->id, 3);
+        
+        $recommendedAds = $this->mergeFollowingAdsWithRecommendations($smartAds, $followingAds, $limit);
 
         $recommendedAds = $recommendedAds->map(function (Adv $ad) {
             return $this->queryService->is_actionUser($ad);
@@ -63,7 +67,25 @@ class RecommendedController extends Controller
 
     private function getGeneralRecommendations($limit)
     {
-        $ads = $this->advrepository->getGeneralRecommendations($limit);
+        $user = auth()->user();
+        $ads = collect();
+        
+        $followingAds = $this->advrepository->getFollowingUsersAds($user->id, 3);
+        
+        if ($followingAds->isNotEmpty()) {
+            $ads = $ads->merge($followingAds);
+        }
+        
+        $remainingLimit = $limit - $ads->count();
+        if ($remainingLimit > 0) {
+            $excludeIds = $ads->pluck('id')->toArray();
+            $generalAds = $this->advrepository->getGeneralRecommendations($remainingLimit);
+            
+            $generalAds = $generalAds->whereNotIn('id', $excludeIds);
+            $ads = $ads->merge($generalAds);
+        }
+        
+        $ads = $ads->take($limit);
 
         $ads = $ads->map(function (Adv $ad) {
             return $this->queryService->is_actionUser($ad);
@@ -101,6 +123,30 @@ class RecommendedController extends Controller
     }
 
  
+    private function mergeFollowingAdsWithRecommendations($smartAds, $followingAds, $limit)
+    {
+        $mergedAds = collect();
+        
+        if ($followingAds->isNotEmpty()) {
+            $mergedAds = $mergedAds->merge($followingAds);
+        }
+        
+        if ($smartAds->isNotEmpty()) {
+            $excludeIds = $mergedAds->pluck('id')->toArray();
+            $filteredSmartAds = $smartAds->whereNotIn('id', $excludeIds);
+            $mergedAds = $mergedAds->merge($filteredSmartAds);
+        }
+        
+        if ($mergedAds->count() < $limit) {
+            $remainingLimit = $limit - $mergedAds->count();
+            $excludeIds = $mergedAds->pluck('id')->toArray();
+            $additionalAds = $this->advrepository->getGeneralRecommendations($remainingLimit);
+            $filteredAdditionalAds = $additionalAds->whereNotIn('id', $excludeIds);
+            $mergedAds = $mergedAds->merge($filteredAdditionalAds);
+        }
+        
+        return $mergedAds->take($limit)->values();
+    }
 
     public function getRecommendedForUser(User $user)
     {

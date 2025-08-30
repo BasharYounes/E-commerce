@@ -150,6 +150,51 @@ class User extends Authenticatable
         return Storage::url($value);
     }
     
+     public function follow(User $user)
+    {
+        if (!$this->isFollowing($user)) {
+            \DB::transaction(function () use ($user) {
+                $this->following()->attach($user);
+                
+                $this->increment('following_count');
+                $user->increment('followers_count');
+            });
+        }
+    }
+
+
+    public function unfollow(User $user)
+    {
+        \DB::transaction(function () use ($user) {
+            $this->following()->detach($user);
+            
+            $this->decrement('following_count');
+            $user->decrement('followers_count');
+        });
+    }
+
+    /**
+     * العلاقة مع المتابعين
+     */
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'followed_id', 'follower_id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * العلاقة مع المتابَعين
+     */
+    public function following()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followed_id')
+                    ->withTimestamps();
+    }
     
+    // للتحقق إذا كان يتابع مستخدم معين
+    public function isFollowing(User $user)
+    {
+        return $this->following()->where('followed_id', $user->id)->exists();
+    }
 
 }

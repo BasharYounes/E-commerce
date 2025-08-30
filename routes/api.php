@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TestNotificationController;
 use Illuminate\Http\Request;
@@ -47,7 +48,6 @@ Route::prefix('user')->group(function () {
 Route::prefix('adv')->group(function () {
     Route::get('/',     [AdvController::class, 'index']);
     Route::get('/recommended', [RecommendedController::class, 'index']);
-    Route::post('/get-recommendations-favourite', [RecommendedController::class, 'getRecommendationsForUser']);
     Route::get('/show-visitor/{id}', [AdvController::class, 'showVisitor']);
 
 
@@ -66,6 +66,8 @@ Route::prefix('adv')->group(function () {
         Route::get('/all-user-advs',       [AdvController::class, 'userAdvs']);
 
         Route::get('/show-user/{id}', [AdvController::class, 'showUser']);
+
+        Route::get('/get-recommendations-favourite', [RecommendedController::class, 'getRecommendationsForUser']);
     });
 });
 
@@ -94,6 +96,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/store-fcm-token', [AuthController::class, 'storeFCM_Token']);
 
     Route::post('/mark-is-read',[NotificationController::class,'markAsRead']);
+
+    Route::post('/follow/{id}',[FollowController::class,'follow']);
+    
+    Route::delete('/unfollow/{id}',[FollowController::class,'unfollow']);
 
     // Test notification routes
     Route::post('/test-notification', [TestNotificationController::class, 'sendTestNotification']);

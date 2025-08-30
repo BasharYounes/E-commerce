@@ -90,4 +90,32 @@ class AdvRepository
     }
 
     
+    public function getFollowingUsersAds($userId, $adsPerUser = 3, $excludeIds = [])
+    {
+        $followingUserIds = DB::table('follows')
+            ->where('follower_id', $userId)
+            ->pluck('followed_id');
+
+        if ($followingUserIds->isEmpty()) {
+            return collect();
+        }
+
+        $ads = collect();
+        
+        foreach ($followingUserIds as $followingUserId) {
+            $userAds = Adv::with('user:id,name', 'category:id,name')
+                ->where('user_id', $followingUserId)
+                ->where('is_active', 1)
+                ->whereNotIn('id', $excludeIds)
+                ->orderBy('created_at', 'desc')
+                ->limit($adsPerUser)
+                ->get();
+                
+            $ads = $ads->merge($userAds);
+        }
+
+        return $ads->shuffle()->values();
+    }
+
+    
 }

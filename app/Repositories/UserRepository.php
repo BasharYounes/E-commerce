@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Storage;
 
 class UserRepository {
     use ApiResponse;
+
+    
     public function findByEmail($email) {
         return User::where('email', $email)->firstOrFail();
     }
@@ -51,8 +53,8 @@ class UserRepository {
         return $user->createToken('password-reset-token')->plainTextToken;
     }
 
-    public function findToken($token)
+    public function findById($id)
     {
-        return \Laravel\Sanctum\PersonalAccessToken::findToken($token);
+        return User::findOrFail($id);
     }
 }
