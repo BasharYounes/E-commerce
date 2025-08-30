@@ -71,11 +71,13 @@ Route::prefix('adv')->group(function () {
 
 Route::prefix('category')->group(function () {
     Route::get('/',     [CategoryController::class, 'index']);
+    Route::get('get-adv-bycategory/{id}',     [CategoryController::class, 'getAdvByCategory']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create',       [CategoryController::class, 'store']);
         Route::put('/update/{id}',    [CategoryController::class, 'update']);
         Route::delete('/delete/{id}', [CategoryController::class, 'destroy']);
+    
     });
 });
 
