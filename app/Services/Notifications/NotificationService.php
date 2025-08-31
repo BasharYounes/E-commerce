@@ -57,18 +57,25 @@ class NotificationService
                 return;
             }
 
+            \Log::info('محاولة إرسال إشعار للمستخدم: ' . $user->id . ' مع token: ' . substr($user->fcm_token, 0, 20) . '...');
+
             $messaging = app('firebase.messaging');
+            
+            // استخدام نفس منطق الكود الذي يعمل في web.php
             $message = CloudMessage::withTarget('token', $user->fcm_token)
-                ->withNotification($content)
-                ->withData([
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                    'sound' => 'default'
+                ->withNotification([
+                    'title' => $content['title'],
+                    'body' => $content['body']
                 ]);
             
-            $messaging->send($message);
-            \Log::info('تم إرسال الإشعار بنجاح للمستخدم: ' . $user->id);
+            \Log::info('تم إنشاء الرسالة بنجاح، محاولة الإرسال...');
+            
+            $result = $messaging->send($message);
+            
+            \Log::info('تم إرسال الإشعار بنجاح للمستخدم: ' . $user->id . ' - النتيجة: ' . json_encode($result));
         } catch (\Exception $e) {
             \Log::error('فشل إرسال الإشعار للمستخدم ' . $user->id . ': ' . $e->getMessage());
+            \Log::error('تفاصيل الخطأ: ' . $e->getTraceAsString());
         }
     }
     
