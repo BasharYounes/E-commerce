@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Events\AdPublishedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -25,7 +26,9 @@ class User extends Authenticatable
         'password',
         'email_verified_at',
         'phone',
-        'fcm_token'
+        'fcm_token',
+        'verified_at',
+        'is_verified'
     ];
 
     /**
@@ -51,6 +54,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'published_at' => 'datetime',
             'password' => 'hashed',
+            'verified_at' => 'datetime',
         ];
     }
 
@@ -159,6 +163,7 @@ class User extends Authenticatable
                 $this->increment('following_count');
                 $user->increment('followers_count');
             });
+            
         }
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\AuthunticateRequestController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TestNotificationController;
@@ -101,9 +102,16 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::delete('/unfollow/{id}',[FollowController::class,'unfollow']);
 
-    // Test notification routes
-    Route::post('/test-notification', [TestNotificationController::class, 'sendTestNotification']);
-    Route::post('/send-notification-to-all', [TestNotificationController::class, 'sendNotificationToAll']);
-
+    Route::post('/authenticate-request', [AuthunticateRequestController::class, 'store']);
+    Route::get('/my-authenticate-request', [AuthunticateRequestController::class, 'myRequest']);
 
 });
+
+
+
+    
+    Route::prefix('admin')->group(function () {
+        Route::get('/authenticate-requests', [AuthunticateRequestController::class, 'index']);
+        Route::post('/authenticate-requests/{requestId}/approve', [AuthunticateRequestController::class, 'approve']);
+        Route::post('/authenticate-requests/{requestId}/reject', [AuthunticateRequestController::class, 'reject']);
+    });

@@ -14,7 +14,7 @@ class StoreAdRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'sometimes|mimes:jpeg,png,jpg,gif,svg|max:255',
+            'image' => 'sometimes|mimes:jpeg,png,jpg,gif,svg',
             'price' => 'required|numeric|min:0',
             'location' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',

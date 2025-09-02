@@ -14,5 +14,9 @@ return [
            'title' => 'إشعار جديد', 
             'body' => 'تم نشر الإعلان بنجاح'
         ],
+        'new_ad_from_following' => [
+            'title' => 'إعلان جديد من {{publisher_name}}',
+            'body' => 'قام {{publisher_name}} بنشر إعلان جديد: {{ad_title}}'
+        ],
     ]
 ];

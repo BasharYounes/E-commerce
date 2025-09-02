@@ -4,6 +4,7 @@ namespace App\Services\Adv;
 
 use App\Models\Adv;
 use App\Jobs\UpdateAdReadJob;
+use App\Events\AdPublishedEvent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,7 +12,6 @@ class AdCommandService
 {
     public function createAd($request): Adv
     {  
-        // Accept either a Request/FormRequest or an array of attributes
         if (is_array($request)) {
             $data = $request;
         } else {
@@ -37,6 +37,9 @@ class AdCommandService
             return Adv::create($data);
         });
         UpdateAdReadJob::dispatch('created', $ad);
+        
+        AdPublishedEvent::dispatch($ad, auth()->user());
+        
         return $ad;
     }
 

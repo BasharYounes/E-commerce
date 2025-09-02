@@ -20,7 +20,7 @@ class Adv extends Model
         'phone'
     ];
 
-    protected $hidden = ['created_at', 'updated_at'];
+    // protected $hidden = ['created_at', 'updated_at'];
 
     public function category()
     {
@@ -32,7 +32,6 @@ class Adv extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // Many-to-Many relationships through pivot tables
     public function likedByUsers()
     {
         return $this->belongsToMany(User::class, 'likes', 'adv_id', 'user_id');

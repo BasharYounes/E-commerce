@@ -61,7 +61,6 @@ class NotificationService
 
             $messaging = app('firebase.messaging');
             
-            // استخدام نفس منطق الكود الذي يعمل في web.php
             $message = CloudMessage::withTarget('token', $user->fcm_token)
                 ->withNotification([
                     'title' => $content['title'],

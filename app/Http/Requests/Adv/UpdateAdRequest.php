@@ -14,7 +14,7 @@ class UpdateAdRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'sometimes|string|mimes:jpeg,png,jpg,gif,svg|max:255',
+            'image' => 'sometimes|string|mimes:jpeg,png,jpg,gif,svg',
             'price' => 'sometimes|numeric|min:0',
             'location' => 'sometimes|string|max:255',
             'category_id' => 'sometimes|exists:categories,id',

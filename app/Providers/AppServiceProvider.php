@@ -17,19 +17,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(PodcastStrategy::class, function () {
-            return new PodcastStrategy(
-                app(ChannelService::class), 
-                app(PodcastRepository::class)
-            );
-        });
+        // $this->app->bind(PodcastStrategy::class, function () {
+        //     return new PodcastStrategy(
+        //         app(ChannelService::class), 
+        //         app(PodcastRepository::class)
+        //     );
+        // });
 
-        $this->app->bind(AudiobookStrategy::class, function () {
-            return new AudiobookStrategy(
-                app(ChannelService::class), 
-                app(AudiobookRepository::class)
-            );
-        });
+        // $this->app->bind(AudiobookStrategy::class, function () {
+        //     return new AudiobookStrategy(
+        //         app(ChannelService::class), 
+        //         app(AudiobookRepository::class)
+        //     );
+        // });
     }
 
     /**
