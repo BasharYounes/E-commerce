@@ -13,7 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'banned' => \App\Http\Middleware\CheckBannedUser::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (Throwable $e, $request) {

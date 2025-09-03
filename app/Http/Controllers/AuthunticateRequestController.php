@@ -2,71 +2,69 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\GenericNotificationEvent;
+use App\Repositories\AuthunticateRequests\RequestRepository;
+use App\Repositories\UserRepository;
 use Auth;
 use Illuminate\Http\Request;
 use App\Models\AuthunticateRequest;
+use App\Traits\ApiResponse;
 
 class AuthunticateRequestController extends Controller
 {
+    use ApiResponse;
+
+    public function __construct(
+        public RequestRepository $requestRepository,
+        public UserRepository $userRepository
+    ){}
+
     public function store(Request $request)
     {
         $request->validate([
-            'document' => 'required|file|mimes:pdf,jpg,jpeg,png,zip,rar|max:5120' // 5MB كحد أقصى
+            'document' => 'required|file|mimes:pdf,jpg,jpeg,png,zip,rar|max:5120' 
         ]);
 
-        $existingRequest = AuthunticateRequest::where('user_id', Auth::id())
-                                            ->where('status', 'pending')
-                                            ->first();
+        $existingRequest = $this->requestRepository->findRequestByUser_id();
                                             
         if ($existingRequest) {
-            return response()->json([
+            return $this->error('لقد حدث خطأ',[
                 'error' => 'لديك طلب توثيق قيد المراجعة بالفعل'
             ], 400);
         }
 
-        $documentPath = $request->file('document')->store('authenticate_documents','public');
+        $documentPath = $this->requestRepository->storeDocument($request);
 
-        $authRequest = AuthunticateRequest::create([
-            'user_id' => Auth::id(),
-            'document_path' => 'storage/'.$documentPath,
-            'status' => 'pending'
-        ]);
+        $authRequest = $this->requestRepository->storeRequest($documentPath);
 
-        return response()->json([
-            'message' => 'تم تقديم طلب التوثيق بنجاح وسيتم مراجعته قريباً',
-            'data' => $authRequest
-        ], 201);
+        return $this->success('تم تقديم طلب التوثيق بنجاح وسيتم مراجعته قريباً',['data' => $authRequest], 201);
     }
 
     public function index(Request $request)
     {
         $status = $request->query('status', 'pending');
-        $requests = AuthunticateRequest::with('user')
-                        ->where('status', $status)
-                        ->orderBy('created_at', 'desc')
-                        ->paginate(20);
+        $requests = $this->requestRepository->allPendingRequests($status);
 
-        return response()->json(['data' => $requests]);
+        return $this->success('The Resualts :',['data' => $requests]);
     }
 
     public function approve($requestId)
     {
-        $authRequest = AuthunticateRequest::with('user')->findOrFail($requestId);
+        $authRequest = $this->requestRepository->findRequest($requestId);
         
-        $authRequest->update([
+        $this->requestRepository->updateRequest($authRequest,[
             'status' => 'approved',
             'processed_at' => now()
         ]);
 
-        $authRequest->user->update([
+        $this->userRepository->update($authRequest->user,[
             'is_verified' => true,
             'verified_at' => now()
         ]);
 
-        return response()->json([
-            'message' => 'تم الموافقة على طلب التوثيق',
-            'data' => $authRequest
-        ]);
+        GenericNotificationEvent::dispatch($authRequest->user,'Accept_Request',[]);
+
+        return $this->success('تم الموافقة على طلب التوثيق',['data' => $authRequest]);
     }
 
     public function reject(Request $request, $requestId)
@@ -75,27 +73,28 @@ class AuthunticateRequestController extends Controller
             'rejection_reason' => 'required|string|max:500'
         ]);
 
-        $authRequest = AuthunticateRequest::findOrFail($requestId);
-        
-        $authRequest->update([
+        $authRequest = $this->requestRepository->findRequest($requestId);
+
+        $this->requestRepository->updateRequest($authRequest,[
             'status' => 'rejected',
             'rejection_reason' => $request->rejection_reason,
             'processed_at' => now()
         ]);
 
-        return response()->json([
-            'message' => 'تم رفض طلب التوثيق',
-            'data' => $authRequest
-        ]);
+        GenericNotificationEvent::dispatch(
+            $authRequest->user,
+            'reject_Request',
+            ['rejection_reason' => $request->rejection_reason]
+        );
+        
+        return $this->success('تم رفض طلب التوثيق',['data' => $authRequest]);
     }
 
     // الحصول على حالة طلبي (للمستخدم العادي)
     public function myRequest()
     {
-        $authRequest = AuthunticateRequest::where('user_id', Auth::id())
-                        ->orderBy('created_at', 'desc')
-                        ->first();
+        $authRequest = $this->requestRepository->getAllUserRequests();
 
-        return response()->json(['data' => $authRequest]);
+        return $this->success('The Requests :',['data' => $authRequest]);
     }
 }

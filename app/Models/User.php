@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Events\AdPublishedEvent;
+use App\Events\GenericNotificationEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -162,6 +163,8 @@ class User extends Authenticatable
                 
                 $this->increment('following_count');
                 $user->increment('followers_count');
+
+                GenericNotificationEvent::dispatch($this,'new_follower',['follower_name' => $user->name]);
             });
             
         }
@@ -200,6 +203,24 @@ class User extends Authenticatable
     public function isFollowing($id)
     {
         return $this->following()->where('followed_id', $id)->exists();
+    }
+
+    // العلاقة مع الحظورات
+    public function bans()
+    {
+        return $this->hasMany(Ban::class);
+    }
+
+    // الحصول على آخر حظر فعال
+    public function activeBan()
+    {
+        return $this->bans()->active()->latest()->first();
+    }
+
+    // التحقق إذا كان المستخدم محظورًا حالياً
+    public function isBanned()
+    {
+        return $this->is_banned || $this->bans()->active()->exists();
     }
 
 }

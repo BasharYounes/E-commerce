@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\AuthunticateRequestController;
+use App\Http\Controllers\BanController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TestNotificationController;
@@ -34,84 +35,88 @@ Route::post('/resend-code',[AuthController::class,'ResendCode'])->middleware('th
 Route::post('/forget-password',[ForgetPasswordController::class,'forgotPassword']);
 Route::post('/check-code',[ForgetPasswordController::class,'checkCode']);
 
+Route::middleware('banned')->group(function () {
+
+    Route::prefix('user')->group(function () {
+
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::post('/update',    [AuthController::class, 'EditInformation']); // edit user info
+            Route::get('/favorites', [AdvController::class, 'getUserFavorites']);
+            Route::get('/', [AuthController::class, 'getUser']);
+        });
+    });
 
 
-Route::prefix('user')->group(function () {
+    Route::prefix('adv')->group(function () {
+        Route::get('/',     [AdvController::class, 'index']);
+        Route::get('/recommended', [RecommendedController::class, 'index']);
+        Route::get('/show-visitor/{id}', [AdvController::class, 'showVisitor']);
+
+
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::post('/create',       [AdvController::class, 'store']);
+            Route::put('/update/{id}',    [AdvController::class, 'update']);
+            Route::delete('/delete/{id}', [AdvController::class, 'destroy']);
+            Route::post('/search',[AdvController::class,'search']);
+
+            Route::post('/add-like', [AdvController::class, 'addLike']); // addLike
+            Route::post('/remove-like', [AdvController::class, 'removeLike']); // removeLike
+
+            Route::post('/add-favorite', [AdvController::class, 'addToFavorite']); // addFavorite
+            Route::post('/remove-favorite', [AdvController::class, 'removeFromFavorite']); // removeFavorite
+
+            Route::get('/all-user-advs',       [AdvController::class, 'userAdvs']);
+
+            Route::get('/show-user/{id}', [AdvController::class, 'showUser']);
+
+            Route::get('/get-recommendations-favourite', [RecommendedController::class, 'getRecommendationsForUser']);
+        });
+    });
+
+    Route::prefix('category')->group(function () {
+        Route::get('/',     [CategoryController::class, 'index']);
+        Route::get('get-adv-bycategory/{id}',     [CategoryController::class, 'getAdvByCategory']);
+
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::post('/create',       [CategoryController::class, 'store']);
+            Route::put('/update/{id}',    [CategoryController::class, 'update']);
+            Route::delete('/delete/{id}', [CategoryController::class, 'destroy']);
+        
+        });
+    });
 
     Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/update',    [AuthController::class, 'EditInformation']); // edit user info
-        Route::get('/favorites', [AdvController::class, 'getUserFavorites']);
-        Route::get('/', [AuthController::class, 'getUser']);
+        Route::post('/reset-password',[ForgetPasswordController::class,'resetPassword']);
+
+        Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
+        Route::post('/logout',        [AuthController::class, 'logout']);
+
+        Route::get('/notifications', [NotificationController::class, 'index']);
+
+        Route::get('/show-notification/{id}', [NotificationController::class, 'show']);
+
+        Route::post('/store-fcm-token', [AuthController::class, 'storeFCM_Token']);
+
+        Route::post('/mark-is-read',[NotificationController::class,'markAsRead']);
+
+        Route::post('/follow/{id}',[FollowController::class,'follow']);
+        
+        Route::delete('/unfollow/{id}',[FollowController::class,'unfollow']);
+
+        Route::post('/authenticate-request', [AuthunticateRequestController::class, 'store']);
+        Route::get('/my-authenticate-request', [AuthunticateRequestController::class, 'myRequest']);
+
     });
-});
-
-
-Route::prefix('adv')->group(function () {
-    Route::get('/',     [AdvController::class, 'index']);
-    Route::get('/recommended', [RecommendedController::class, 'index']);
-    Route::get('/show-visitor/{id}', [AdvController::class, 'showVisitor']);
-
-
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/create',       [AdvController::class, 'store']);
-        Route::put('/update/{id}',    [AdvController::class, 'update']);
-        Route::delete('/delete/{id}', [AdvController::class, 'destroy']);
-        Route::post('/search',[AdvController::class,'search']);
-
-        Route::post('/add-like', [AdvController::class, 'addLike']); // addLike
-        Route::post('/remove-like', [AdvController::class, 'removeLike']); // removeLike
-
-        Route::post('/add-favorite', [AdvController::class, 'addToFavorite']); // addFavorite
-        Route::post('/remove-favorite', [AdvController::class, 'removeFromFavorite']); // removeFavorite
-
-        Route::get('/all-user-advs',       [AdvController::class, 'userAdvs']);
-
-        Route::get('/show-user/{id}', [AdvController::class, 'showUser']);
-
-        Route::get('/get-recommendations-favourite', [RecommendedController::class, 'getRecommendationsForUser']);
-    });
-});
-
-Route::prefix('category')->group(function () {
-    Route::get('/',     [CategoryController::class, 'index']);
-    Route::get('get-adv-bycategory/{id}',     [CategoryController::class, 'getAdvByCategory']);
-
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/create',       [CategoryController::class, 'store']);
-        Route::put('/update/{id}',    [CategoryController::class, 'update']);
-        Route::delete('/delete/{id}', [CategoryController::class, 'destroy']);
-    
-    });
-});
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/reset-password',[ForgetPasswordController::class,'resetPassword']);
-
-    Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
-    Route::post('/logout',        [AuthController::class, 'logout']);
-
-    Route::get('/notifications', [NotificationController::class, 'index']);
-
-    Route::get('/show-notification/{id}', [NotificationController::class, 'show']);
-
-    Route::post('/store-fcm-token', [AuthController::class, 'storeFCM_Token']);
-
-    Route::post('/mark-is-read',[NotificationController::class,'markAsRead']);
-
-    Route::post('/follow/{id}',[FollowController::class,'follow']);
-    
-    Route::delete('/unfollow/{id}',[FollowController::class,'unfollow']);
-
-    Route::post('/authenticate-request', [AuthunticateRequestController::class, 'store']);
-    Route::get('/my-authenticate-request', [AuthunticateRequestController::class, 'myRequest']);
 
 });
-
-
 
     
     Route::prefix('admin')->group(function () {
         Route::get('/authenticate-requests', [AuthunticateRequestController::class, 'index']);
         Route::post('/authenticate-requests/{requestId}/approve', [AuthunticateRequestController::class, 'approve']);
         Route::post('/authenticate-requests/{requestId}/reject', [AuthunticateRequestController::class, 'reject']);
+
+        Route::post('/ban/{userId}', [BanController::class, 'banUser']);
+        Route::post('/unban/{userId}', [BanController::class, 'unbanUser']);
+        Route::get('/user-bans/{userId}', [BanController::class, 'getUserBans']);
     });
