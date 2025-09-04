@@ -119,4 +119,6 @@ Route::middleware('banned')->group(function () {
         Route::post('/ban/{userId}', [BanController::class, 'banUser']);
         Route::post('/unban/{userId}', [BanController::class, 'unbanUser']);
         Route::get('/user-bans/{userId}', [BanController::class, 'getUserBans']);
+
+        
     });

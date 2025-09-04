@@ -11,3 +11,8 @@ Route::prefix('report')->group(function () {
         Route::post('/getAll',    [ReportController::class, 'index']);
     });
 });
+
+Route::prefix('admin')->group(function () {
+    Route::post('active-adv/{id}',[ReportController::class,'activeAdv']);
+    Route::post('un-active-adv/{id}',[ReportController::class,'unActiveAdv']);
+});
