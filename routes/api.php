@@ -48,7 +48,7 @@ Route::middleware('banned')->group(function () {
 
 
     Route::prefix('adv')->group(function () {
-        Route::get('/',     [AdvController::class, 'index']);
+        
         Route::get('/recommended', [RecommendedController::class, 'index']);
         Route::get('/show-visitor/{id}', [AdvController::class, 'showVisitor']);
 
@@ -118,7 +118,9 @@ Route::middleware('banned')->group(function () {
 
         Route::post('/ban/{userId}', [BanController::class, 'banUser']);
         Route::post('/unban/{userId}', [BanController::class, 'unbanUser']);
-        Route::get('/user-bans/{userId}', [BanController::class, 'getUserBans']);
+        Route::get('/user-bans', [BanController::class, 'getBanUsers']);
+
+        Route::get('/',     [AdvController::class, 'index']);
 
         
     });

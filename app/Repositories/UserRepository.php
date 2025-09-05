@@ -36,6 +36,7 @@ class UserRepository {
         }
 
         $user->update($data);
+        
         return $user->fresh();
     }
 

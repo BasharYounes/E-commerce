@@ -4,6 +4,7 @@ namespace App\Services\Adv;
 
 use App\Models\AdvRead;
 use App\Models\Adv;
+use App\Models\Evaluation;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -131,7 +132,20 @@ class AdQueryService
             ->all();
     }
 
+    public function updateAdvRate($id)
+    {
+        $adv = Adv::findOrFail($id);
 
+        $usersRate = Evaluation::where('adv_id',$adv->id)->get();
+        $rate = 0;
+        foreach($usersRate as $userRate)
+        {
+            $rate += $userRate->rating;
+        }
+        $rate /= $usersRate->count();
+
+        $adv->update(['rate' => $rate]);
+    }
 
 
 }

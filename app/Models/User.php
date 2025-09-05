@@ -29,7 +29,12 @@ class User extends Authenticatable
         'phone',
         'fcm_token',
         'verified_at',
-        'is_verified'
+        'is_verified',
+        'is_banned',
+        'banned_at',
+        'ban_reason',
+        'followers_count',
+        'following_count'
     ];
 
     /**

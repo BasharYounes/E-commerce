@@ -12,7 +12,8 @@ class Report extends Model
         'adv_id',
         'user_id',
         'type',
-        'content'
+        'content',
+        'is_view'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];

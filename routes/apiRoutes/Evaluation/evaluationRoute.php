@@ -8,6 +8,9 @@ Route::prefix('evaluation')->group(function () {
 
     Route::middleware(['auth:sanctum', 'banned'])->group(function () {
         Route::post('/create',    [EvaluationController::class, 'store']);
-        Route::post('/getAll',    [EvaluationController::class, 'index']);
+        
     });
+});
+Route::prefix('admin')->group(function () {
+    Route::post('/getAll',    [EvaluationController::class, 'index']);
 });

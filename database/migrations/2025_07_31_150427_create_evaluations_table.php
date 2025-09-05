@@ -18,6 +18,7 @@ return new class extends Migration
             $table->float('rating')->unsigned()->between(1, 5);
             $table->text('comment')->nullable();
             $table->timestamps();
+            
         });
     }
 

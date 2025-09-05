@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Evaluation\StoreEvaluationRequest;
 use App\Models\Evaluation;
+use App\Services\Adv\AdQueryService;
 use App\Traits\ApiResponse;
 
 
@@ -13,7 +14,8 @@ class EvaluationController extends Controller
 {
     use ApiResponse;
     public function __construct(
-        public EvaluationCommandService $commandService
+        public EvaluationCommandService $commandService,
+        public AdQueryService $adQueryService,
     ) {}
 
     public function index()
@@ -24,6 +26,9 @@ class EvaluationController extends Controller
     public function store(StoreEvaluationRequest $request)
     {
         $report = $this->commandService->createEvaluation($request->validated());
+
+        $this->adQueryService->updateAdvRate($report->adv_id);
+        
         return $this->success('success',$report);
     }
 

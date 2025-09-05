@@ -17,7 +17,8 @@ class Adv extends Model
         'description',
         'is_active',
         'user_id',
-        'phone'
+        'phone',
+        'rate',
     ];
 
     // protected $hidden = ['created_at', 'updated_at'];
