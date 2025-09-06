@@ -16,11 +16,14 @@ class BanUserRepository
     {
         Ban::where('user_id', $userId)
             ->active()
-            ->update(['banned_until' => now()]);
+            ->update([
+            'banned_until' => now(),
+            'is_permanent' => false    
+        ]);
     }
 
     public function getAllBanUsers()
     {
-        return Ban::where('banned_until','>', now())->orWhere('is_permanent',true);
+        return Ban::with('user:id,name')->where('banned_until','>', now())->orWhere('is_permanent',true);
     }
 }

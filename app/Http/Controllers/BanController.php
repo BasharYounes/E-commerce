@@ -46,6 +46,8 @@ class BanController extends Controller
     {
         $user = $this->userRepository->findById($userId);
 
+        // $isBan = Ban::where('until_banned')
+
         $this->userRepository->update($user,[
             'is_banned' => false,
             'banned_at' => null,

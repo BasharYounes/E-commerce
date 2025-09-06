@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\AdminStatsController;
 use App\Http\Controllers\AuthunticateRequestController;
 use App\Http\Controllers\BanController;
 use App\Http\Controllers\FollowController;
@@ -121,6 +122,10 @@ Route::middleware('banned')->group(function () {
         Route::get('/user-bans', [BanController::class, 'getBanUsers']);
 
         Route::get('/',     [AdvController::class, 'index']);
+
+        Route::get('/dashboard-stats', [AdminStatsController::class, 'getDashboardStats']);
+    
+        Route::post('/clear-stats-cache', [AdminStatsController::class, 'clearStatsCache']);
 
         
     });

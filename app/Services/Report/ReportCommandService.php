@@ -24,7 +24,19 @@ class ReportCommandService
 
     public function findReport($id)
     {
-        return Report::findOrFail($id);
+    //     return Report::with([
+    //     'user:id,is_banned',
+    //     'adv' => function($query) {
+    //         $query->select('*'); 
+    //         $query->with(['category' => function($q) {
+    //             $q->select('id', 'name');
+    //         }]);
+    //     }
+    // ])->findOrFail($id);
+     return Report::with([
+        'user:id,is_banned',
+        'adv.category:id,name'
+    ])->findOrFail($id);
     }
 
     public function updateViewReport(Report $report,$data)
@@ -34,7 +46,7 @@ class ReportCommandService
 
     public function getAllReports()
     {
-        $reports = Report::with('user:id,name', 'adv:id,description')->get();
+        $reports = Report::with('user:id,name', 'adv:id,description,is_active')->get();
         $nonViewedReports = Report::where('is_view',false)->count();
         return $this->success('The Reports are With count of reports which are not viewed ',[$reports,$nonViewedReports]);
     }
