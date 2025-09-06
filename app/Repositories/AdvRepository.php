@@ -13,7 +13,7 @@ class AdvRepository
         return Adv::findOrFail($id);
     }
 
-    public function getGeneralRecommendations($limit = 10)
+    public function getGeneralRecommendations($limit = 20)
     {
         return Adv::with('user:id,name', 'category:id,name','created_at')
             ->where('is_active', 1)
