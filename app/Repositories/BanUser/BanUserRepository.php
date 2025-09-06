@@ -24,6 +24,6 @@ class BanUserRepository
 
     public function getAllBanUsers()
     {
-        return Ban::with('user:id,name')->where('banned_until','>', now())->orWhere('is_permanent',true);
+        return Ban::with('user:id,name')->where('banned_until','>', now())->orWhere('is_permanent',true)->get();
     }
 }
