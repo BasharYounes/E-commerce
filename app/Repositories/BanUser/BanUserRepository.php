@@ -6,8 +6,9 @@ use App\Models\Ban;
 
 class BanUserRepository
 {
-    public function createBan($data)
+    public function createBan($data ,$id)
     {
+        $data['user_id'] = $id;
         return Ban::create($data);
     }
 

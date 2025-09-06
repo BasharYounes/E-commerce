@@ -12,5 +12,5 @@ Route::prefix('evaluation')->group(function () {
     });
 });
 Route::prefix('admin')->group(function () {
-    Route::post('/getAll',    [EvaluationController::class, 'index']);
+    Route::post('/get-all',    [EvaluationController::class, 'index']);
 });

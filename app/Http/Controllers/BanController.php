@@ -21,7 +21,7 @@ class BanController extends Controller
     {
         $user = $this->userRepository->findById($userId);
 
-        $ban = $this->banUserRepository->createBan($request->validated());
+        $ban = $this->banUserRepository->createBan($request->validated(),$userId);
 
         $this->userRepository->update($user,[
             'is_banned' => true,
