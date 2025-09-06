@@ -169,7 +169,7 @@ class User extends Authenticatable
                 $this->increment('following_count');
                 $user->increment('followers_count');
 
-                GenericNotificationEvent::dispatch($this,'new_follower',['follower_name' => $user->name]);
+                GenericNotificationEvent::dispatch($user,'new_follower',['follower_name' => $this->name]);
             });
             
         }

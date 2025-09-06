@@ -70,7 +70,7 @@ Route::middleware('banned')->group(function () {
 
             Route::get('/show-user/{id}', [AdvController::class, 'showUser']);
 
-            Route::get('/get-recommendations-favourite', [RecommendedController::class, 'getRecommendationsForUser']);
+            Route::get('/get-recommendations-favourite', [RecommendedController::class, 'getRecommendedForUser']);
         });
     });
 

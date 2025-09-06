@@ -38,7 +38,7 @@ class RecommendedController extends Controller
         return $this->success('success', $ads);
     }
 
-    public function getSmartRecommendations(Request $request, $limit = 10)
+    public function getSmartRecommendations(Request $request, $limit = 20)
     {
         $user = auth()->user();
         
@@ -148,19 +148,52 @@ class RecommendedController extends Controller
         return $mergedAds->take($limit)->values();
     }
 
-    public function getRecommendedForUser(User $user)
+    public function getRecommendedForUser()
     {
-        $categories = $this->advrepository->getUserPreferredCategories($user->id);
+        $user = auth()->user();
+        // الحصول على الفئات المفضلة للمستخدم
+        $preferredCategories = $this->advrepository->getUserPreferredCategories($user->id);
 
-        $recommendedAds = $this->advrepository->getRecommendedAdsForUser($categories);
-
-        return $this->success('Recommended Favourite Advs are :',$recommendedAds) ;
+        // dd($preferredCategories);
+        
+        // إذا كان لدى المستخدم فئات مفضلة، استخدمها للحصول على التوصيات
+        if (!empty($preferredCategories)) {
+            $recommendedAds = $this->advrepository->getRecommendedAdsForUser(
+                $preferredCategories, 
+                10, 
+                $user->id
+            );
+            
+            return $this->success('تم العثور على توصيات بناءً على اهتماماتك', $recommendedAds);
+        } else {
+            // إذا لم يكن لدى المستخدم تفضيلات، قدم توصيات عامة
+            $fallbackAds = $this->advrepository->getFallbackRecommendations(10, $user->id);
+            
+            return $this->success('توصيات عامة قد تهمك', $fallbackAds);
+        }
     }
 
     public function getUserPreferredCategories(User $user)
     {
-        return $this->success('PreferredCategories',$this->advrepository->getUserPreferredCategories($user->id)) ;
-    }
+        $preferredCategories = $this->advrepository->getUserPreferredCategories($user->id);
+        
+        if (!empty($preferredCategories)) {
+            // الحصول على أسماء الفئات أيضًا
+            $categoriesWithNames = DB::table('categories')
+                ->whereIn('id', $preferredCategories)
+                ->pluck('name', 'id');
+                
+            return $this->success('الفئات المفضلة', [
+                'category_ids' => $preferredCategories,
+                'categories' => $categoriesWithNames
+            ]);
+        } else {
+            return $this->success('لم يتم العثور على فئات مفضلة', [
+                'category_ids' => [],
+                'categories' => []
+            ]);
+        }
+}
 
     //     public function getRecommendationsForUser($id): array
     // {

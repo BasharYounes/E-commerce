@@ -29,7 +29,6 @@ class SmartDatabaseSeeder extends Seeder
         // 2. إنشاء الإعلانات بأنماط واقعية
         $this->createAdsWithPatterns($faker);
 
-        
         // 4. إنشاء تقييمات وبلاغات واقعية
         $this->createReviewsAndReports();
     }

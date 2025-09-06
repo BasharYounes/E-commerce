@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Adv;
+use App\Models\Favorite;
 use Illuminate\Support\Facades\DB;
 
 class AdvRepository
@@ -67,26 +68,63 @@ class AdvRepository
     }
 
   
-    public function getRecommendedAdsForUser($categoryIds)
+    public function getRecommendedAdsForUser($categoryIds, $limit = 10, $excludeUserId = null)
     {
-        return Adv::with('user:id,name', 'category:id,name')
-            ->where('is_active', 1)
-            ->whereIn('category_id', $categoryIds)
-            ->orderBy('created_at', 'desc')
+        $query = Adv::with(['user:id,name', 'category:id,name'])
+            ->where('is_active', 1);
+        
+        if (!empty($categoryIds)) {
+            $query->whereIn('category_id', $categoryIds);
+        }
+        
+        if ($excludeUserId) {
+            $query->where('user_id', '!=', $excludeUserId);
+        }
+        
+        return $query->orderBy('views_count', 'desc') // ترتيب حسب الشعبية
+            ->orderBy('created_at', 'desc') // ثم حسب الأحدث
+            ->take($limit)
             ->get();
     }
 
- 
-    public function getUserPreferredCategories($userId)
+    // دالة جديدة للحصول على توصيات بديلة
+    public function getFallbackRecommendations($limit = 10, $excludeUserId = null)
     {
-        return DB::table('favorites')
-            ->join('advs', 'favorites.adv_id', '=', 'advs.id')
-            ->select('advs.category_id', DB::raw('COUNT(*) as total'))
-            ->where('favorites.user_id', $userId)
-            ->groupBy('advs.category_id')
-            ->orderByDesc('total')
+        $query = Adv::with(['user:id,name', 'category:id,name'])
+            ->where('is_active', 1);
+        
+        if ($excludeUserId) {
+            $query->where('user_id', '!=', $excludeUserId);
+        }
+        
+        return $query->orderBy('interactions_count', 'desc')
+            ->orderBy('views_count', 'desc')
+            ->take($limit)
+            ->get();
+    }
+ 
+   public function getUserPreferredCategories($userId)
+    {
+        $categories = Favorite::with(['adv' => function($query) {
+                $query->where('is_active', true);
+            }])
+            ->where('user_id', $userId)
+            ->get()
+            ->filter(function($favorite) {
+                return $favorite->adv !== null; // التأكد من أن الإعلان موجود ونشط
+            })
+            ->groupBy(function($favorite) {
+                return $favorite->adv->category_id;
+            })
+            ->map(function($group) {
+                return count($group);
+            })
+            ->sortDesc()
             ->take(3)
-            ->pluck('category_id');
+            ->keys()
+            ->toArray();
+        
+        return $categories;
     }
 
     
